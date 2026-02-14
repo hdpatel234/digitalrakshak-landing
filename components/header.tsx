@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Lock, ChevronDown, Search, ArrowRight, ChevronLeft } from 'lucide-react'
+import { Lock, ChevronDown, Search, ArrowRight, ChevronLeft, Menu, X } from 'lucide-react'
 import { servicesData } from '@/lib/services-data'
 import type { MainService, SubService } from '@/lib/services-data'
 
@@ -17,8 +17,10 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
   const [currentLevel, setCurrentLevel] = useState<NavLevel>('main')
   const [activeMainService, setActiveMainService] = useState<MainService | null>(null)
   const [activeSubService, setActiveSubService] = useState<SubService | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   const handleServicesEnter = () => {
     if (closeTimeoutRef.current) {
@@ -55,9 +57,43 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
       setCurrentLevel('subservices')
       setActiveSubService(null)
     } else if (currentLevel === 'subservices') {
-      resetNavigation()
+      setCurrentLevel('main')
+      setActiveMainService(null)
     }
   }
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+    if (!isMobileMenuOpen) {
+      // Reset to main level when opening
+      setCurrentLevel('main')
+      setActiveMainService(null)
+      setActiveSubService(null)
+    }
+  }
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false)
+    resetNavigation()
+  }
+
+  // Handle click outside for mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && 
+          !(event.target as Element).closest('.mobile-menu-button')) {
+        closeMobileMenu()
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isMobileMenuOpen])
 
   // Expose methods via ref for external control
   useEffect(() => {
@@ -69,7 +105,6 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
           }
           
           if (mainServiceName && subServiceName) {
-            // Open at services level with specific subservice
             const mainService = servicesData.find(s => s.name === mainServiceName)
             if (mainService) {
               setActiveMainService(mainService)
@@ -82,40 +117,28 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
               }
             }
           } else if (mainServiceName) {
-            // Open at subservices level
             const mainService = servicesData.find(s => s.name === mainServiceName)
             if (mainService) {
               setActiveMainService(mainService)
               setCurrentLevel('subservices')
             }
           } else {
-            // Open at main level
             setCurrentLevel('main')
           }
           setOpenDropdown('services')
+          // Open mobile menu if on mobile
+          if (window.innerWidth < 768) {
+            setIsMobileMenuOpen(true)
+          }
         },
         closeMenu: () => {
           setOpenDropdown(null)
           resetNavigation()
+          setIsMobileMenuOpen(false)
         }
       }
     }
   }, [headerRef])
-
-  // Handle click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOpenDropdown(null)
-        resetNavigation()
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
 
   useEffect(() => {
     return () => {
@@ -125,18 +148,31 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
     }
   }, [])
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
+
   return (
     <nav className="relative bg-background border-b border-border/40 sticky top-0 z-50">
       {/* Top Navigation Bar */}
-      <div className="flex items-center justify-between px-6 md:px-12 py-4 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between px-4 md:px-12 py-4 max-w-7xl mx-auto">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="DigitalRakshak Logo" className="w-12 h-12" />
-          <h1 className="text-2xl font-bold text-primary">DigitalRakshak</h1>
+          <img src="/logo.png" alt="DigitalRakshak Logo" className="w-10 h-10 md:w-12 md:h-12" />
+          <h1 className="text-xl md:text-2xl font-bold text-primary">DigitalRakshak</h1>
         </div>
 
-        {/* Center Navigation */}
-        <div className="flex items-center gap-8">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
           <div
             className="relative"
             onMouseEnter={handleServicesEnter}
@@ -158,18 +194,31 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
         </div>
 
         {/* Right Side */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
             <Search className="w-5 h-5 text-foreground" />
+          </button>
+          
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={toggleMobileMenu}
+            className="md:hidden p-2 hover:bg-secondary/50 rounded-lg transition-colors mobile-menu-button"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 text-foreground" />
+            ) : (
+              <Menu className="w-6 h-6 text-foreground" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mega Menu Dropdown */}
-      {openDropdown === 'services' && (
+      {/* Desktop Mega Menu Dropdown */}
+      {openDropdown === 'services' && !isMobileMenuOpen && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 right-0 bg-background border-t border-border/40 shadow-2xl max-h-[520px] overflow-hidden"
+          className="hidden md:block absolute top-full left-0 right-0 bg-background border-t border-border/40 shadow-2xl max-h-[520px] overflow-hidden"
           onMouseEnter={handleServicesEnter}
           onMouseLeave={handleServicesLeave}
         >
@@ -291,6 +340,130 @@ export const Header = ({ headerRef }: { headerRef?: React.Ref<HeaderRef> }) => {
                         </div>
                       ))}
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <div 
+          ref={mobileMenuRef}
+          className="md:hidden fixed inset-x-0 top-[73px] bottom-0 bg-background z-50 overflow-y-auto"
+        >
+          <div className="min-h-full pb-10">
+            {/* Mobile Navigation Links */}
+            <div className="p-4 border-b border-border/40">
+              <a 
+                href="#services" 
+                onClick={closeMobileMenu}
+                className="block py-4 text-base font-medium text-foreground hover:text-primary transition-colors border-b border-border/20"
+              >
+                Why Choose Us
+              </a>
+              <a 
+                href="#contact" 
+                onClick={closeMobileMenu}
+                className="block py-4 text-base font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Contact
+              </a>
+            </div>
+
+            {/* Mobile Services Header */}
+            <div className="p-4 border-b border-border/40">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">Services</h3>
+                {currentLevel !== 'main' && (
+                  <button
+                    onClick={handleBackClick}
+                    className="flex items-center gap-1 text-sm text-primary font-medium"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Back
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Services Content */}
+            <div className="p-4">
+              {/* Mobile Main Services */}
+              {currentLevel === 'main' && (
+                <div className="space-y-3">
+                  {servicesData.map((service) => (
+                    <button
+                      key={service.name}
+                      onClick={() => handleMainServiceClick(service)}
+                      className="w-full p-5 rounded-xl border border-border/30 bg-white hover:shadow-md hover:border-primary/40 transition-all duration-300 text-left"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-base font-bold text-foreground mb-2">
+                            {service.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {service.description}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-primary flex-shrink-0 ml-3 mt-1" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Mobile Sub Services */}
+              {currentLevel === 'subservices' && activeMainService && (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {activeMainService.description}
+                  </p>
+                  {activeMainService.subservices.map((subService) => (
+                    <button
+                      key={subService.name}
+                      onClick={() => handleSubServiceClick(subService)}
+                      className="w-full p-5 rounded-xl border border-border/30 bg-white hover:shadow-md hover:border-primary/40 transition-all duration-300 text-left"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h5 className="text-base font-bold text-foreground mb-2">
+                            {subService.name}
+                          </h5>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {subService.description}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-primary flex-shrink-0 ml-3 mt-1" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Mobile Services List */}
+              {currentLevel === 'services' && activeSubService && (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {activeSubService.description}
+                  </p>
+                  <div className="space-y-3">
+                    {activeSubService.services.map((service) => (
+                      <div
+                        key={service.name}
+                        className="p-5 rounded-xl border border-border/30 bg-white"
+                      >
+                        <h5 className="text-base font-bold text-foreground mb-2">
+                          {service.name}
+                        </h5>
+                        <p className="text-sm text-muted-foreground">
+                          {service.description || 'Professional verification service'}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
