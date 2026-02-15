@@ -20,6 +20,7 @@ export function Footer() {
                 </div>
                 <h3 className="text-lg font-bold text-white">DigitalRakshak</h3>
               </div>
+              <p className="text-sm text-slate-400 mb-2">DigitalRakshak InfoTech Pvt. Ltd</p>
               <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">CIN: U78300GJ2025PTC171397</p>
               <p className="text-sm font-mono text-teal-400 mb-6"></p>
               <p className="text-sm text-slate-400 leading-relaxed mb-6">
@@ -123,9 +124,18 @@ export function Footer() {
                   </a>
                 </div>
                 <div className="flex items-start gap-3">
+                  <Mail className="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" />
+                  <a
+                    href="mailto:sales@digitalrakshak.com"
+                    className="text-sm text-slate-400 hover:text-teal-400 transition-colors break-all"
+                  >
+                    sales@digitalrakshak.com
+                  </a>
+                </div>
+                <div className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-slate-400">
-                    Gandhinagar, India
+                    Gandhinagar, Gujarat, India
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
@@ -146,7 +156,7 @@ export function Footer() {
 
           {/* Bottom Footer */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-slate-400">
-            <p>© {currentYear} DigitalRakshak. All rights reserved.</p>
+            <p>© {currentYear} DigitalRakshak InfoTech Pvt. Ltd. All rights reserved.</p>
           </div>
         </div>
       </div>

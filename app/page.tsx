@@ -238,23 +238,56 @@ export default function Home() {
       </section> */}
 
       {/* Direct Contact Section */}
-      <section id="contact" className="px-6 py-12 md:px-12 bg-primary text-primary-foreground">
-        <div className="max-w-2xl mx-auto text-center">
-          <h3 className="text-2xl md:text-3xl font-bold mb-4">
-            Contact Us Directly
-          </h3>
-          <p className="mb-6 text-primary-foreground/90">
-            Reach out to us directly for queries or partnership opportunities
-          </p>
-          <a 
-            href="mailto:contact@digitalrakshak.com"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary-foreground text-primary font-semibold rounded-lg hover:bg-white/90 transition-colors"
-          >
-            <Mail className="w-5 h-5" />
-            info@digitalrakshak.com
-          </a>
-        </div>
-      </section>
+      {/* Contact & Sales Section */}
+<section id="contact" className="px-6 py-16 md:px-12 bg-primary text-primary-foreground">
+  <div className="max-w-4xl mx-auto">
+
+    <div className="grid md:grid-cols-2 gap-8 items-stretch">
+
+      {/* General Contact Card */}
+      <div className="bg-white/10 backdrop-blur rounded-xl p-8 text-center md:text-left">
+        <h3 className="text-xl font-bold mb-2">General Enquiries</h3>
+        <p className="text-primary-foreground/80 mb-6 text-sm">
+          Need help understanding our services or verification process?  
+          Our support team is ready to assist you.
+        </p>
+
+        <a 
+          href="mailto:info@digitalrakshak.com"
+          className="inline-flex items-center gap-2 px-5 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-white/90 transition-colors"
+        >
+          <Mail className="w-5 h-5" />
+          info@digitalrakshak.com
+        </a>
+      </div>
+
+      {/* Sales Card */}
+      <div className="bg-gradient-to-br from-white to-white/90 text-slate-900 rounded-xl p-8 shadow-lg text-center md:text-left">
+        <h3 className="text-xl font-bold mb-2">Talk to Sales</h3>
+        <p className="text-slate-600 mb-6 text-sm">
+          Looking for bulk verification, enterprise onboarding, or partnership opportunities?  
+          Our sales team will help you choose the right solution and pricing.
+        </p>
+
+        <ul className="text-sm text-slate-600 space-y-2 mb-6">
+          <li>✓ Custom pricing for startups & enterprises</li>
+          <li>✓ API & integration guidance</li>
+          <li>✓ Dedicated onboarding support</li>
+        </ul>
+
+        <a 
+          href="mailto:sales@digitalrakshak.com"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          <Mail className="w-5 h-5" />
+          sales@digitalrakshak.com
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
       {/* Footer */}
       <Footer />
