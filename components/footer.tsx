@@ -39,7 +39,7 @@ export function Footer() {
                   <Linkedin className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://www.facebook.com/iDigitalRakshak"
+                  href="https://www.facebook.com/DigitalRakshak"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-400 hover:text-teal-500 transition-colors"
