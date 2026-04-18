@@ -15,6 +15,12 @@ export const metadata: Metadata = {
     description: 'Fast, reliable Aadhar, PAN, and Address verification services',
     type: 'website',
   },
+  icons: {
+    icon: [
+      { url: "/logo.png", sizes: "96x96", type: "image/png" },
+      { url: "/logo.png", type: "image/svg+xml" },
+    ],
+  },
 }
 
 export default function RootLayout({
